@@ -17,14 +17,14 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dump', action='store_false', dest='load')
-    parser.add_argument('--load', action='store_true', dest='load')
+    parser.add_argument('-d', '--dump', action='store_true', dest='dump')
+    parser.add_argument('-l', '--load', action='store_false', dest='dump')
     ret = parser.parse_args(argv)
-    if ret.load:
-        load_yaml(DEFAULT_PATH)
+    if ret.dump:
+        dump_yaml('./*', DEFAULT_PATH)
         return 0
     else:
-        dump_yaml('./*', DEFAULT_PATH)
+        load_yaml(DEFAULT_PATH)
         return 0
 
 
