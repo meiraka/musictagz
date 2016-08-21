@@ -26,6 +26,8 @@ setup(
     ],
     packages=find_packages(exclude=['tests']),
     # install_requires=['python-yaml'],
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
     install_requires=['PyYAML'],
     entry_points={
         'console_scripts': [
