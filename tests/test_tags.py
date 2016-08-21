@@ -9,12 +9,12 @@ def test_flatten(monkeypatch):
             {'plain':
                 {'ALBUM': 'foo',
                  'ALBUMARTIST': 'bar'}},
-        '01*.flac':
+        './01*.flac':
             {'plain':
                 {'TITLE': 'baz',
                  'ARTIST': 'qux',
                  'ARTISTS': ['q', 'u', 'x']}},
-        '02*.flac':
+        './02*.flac':
             {'plain':
                 {'TITLE': 'foobar',
                  'ARTIST': 'quux',
@@ -22,12 +22,11 @@ def test_flatten(monkeypatch):
     }
 
     def mock_glob_glob(pattern):
-        if pattern == '*.flac':
-            return ['01 baz.flac', '02 foobar.flac']
-        elif pattern == '01*.flac':
-            return ['01 baz.flac']
-        else:
-            return ['02 foobar.flac']
+        ans = {'*.flac': ['01 baz.flac', '02 foobar.flac'],
+               './01*.flac': ['./01 baz.flac'],
+               './02*.flac': ['./02 foobar.flac']}
+        assert pattern in ans
+        return ans[pattern]
 
     expect = {
         '01 baz.flac':
@@ -72,3 +71,64 @@ def test_write(monkeypatch):
     monkeypatch.setattr(auto, 'write', mock_auto_write)
 
     tags.write(flatten_data)
+
+
+def test_deflatten():
+    flatten_data = {
+        '01 baz.flac':
+            {'plain':
+                {'TITLE': 'baz',
+                 'ALBUM': 'foo'}},
+        '02 foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar',
+                 'ALBUM': 'foo'}}
+    }
+    expect = {
+        '*.flac':
+            {'plain': {'ALBUM': 'foo'}},
+        '01 baz.flac':
+            {'plain':
+                {'TITLE': 'baz'}},
+        '02 foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar'}}
+    }
+    assert expect == tags.deflatten(flatten_data)
+
+
+def test_search_same_key_value():
+    flatten_data = {
+        '01 baz.flac':
+            {'plain':
+                {'TITLE': 'baz',
+                 'ALBUM': 'foo'}},
+        '02 foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar',
+                 'ALBUM': 'foo'}}
+    }
+    assert {'plain':
+            {'ALBUM': 'foo'}} == tags.search_same_key_value(flatten_data)
+
+
+def test_globbing_path():
+    flatten_data = {
+        '01 baz.flac':
+            {'plain':
+                {'TITLE': 'baz'}},
+        '02 foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar'}}
+    }
+    assert '*.flac' == tags.globbing_path(flatten_data)
+
+    flatten_data = {
+        'disc01-01 baz.flac':
+            {'plain':
+                {'TITLE': 'baz'}},
+        'disc01-02 foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar'}}
+    }
+    assert 'disc01-0*' == tags.globbing_path(flatten_data)
