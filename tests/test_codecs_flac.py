@@ -35,15 +35,17 @@ ARTIST=qux
 ARTISTS=q
 ARTISTS=u
 ARTISTS=x
+COMMENT=\xe3\x81\xbb\xe3\x81\x92
 '''
     monkeypatch.setattr(subprocess, 'check_output', mock_check_output)
     expect = {
         tagtype.PLAIN:
-            {'ALBUM': 'foo',
-             'ALBUMARTIST': 'bar',
-             'TITLE': 'baz',
-             'ARTIST': 'qux',
-             'ARTISTS': ['q', 'u', 'x']}}
+            {u'ALBUM': u'foo',
+             u'ALBUMARTIST': u'bar',
+             u'TITLE': u'baz',
+             u'ARTIST': u'qux',
+             u'ARTISTS': [u'q', u'u', u'x'],
+             u'COMMENT': '\xe3\x81\xbb\xe3\x81\x92'.decode('utf-8')}}
     assert expect == flac.read('01.flac')
 
 
@@ -51,11 +53,12 @@ def test_write(monkeypatch):
     path = '01.flac'
     tag = {
         tagtype.PLAIN:
-            {'ALBUM': 'foo',
-             'ALBUMARTIST': 'bar',
-             'TITLE': 'baz',
-             'ARTIST': 'qux',
-             'ARTISTS': ['q', 'u', 'x']}}
+            {u'ALBUM': u'foo',
+             u'ALBUMARTIST': u'bar',
+             u'TITLE': u'baz',
+             u'ARTIST': u'qux',
+             u'ARTISTS': [u'q', u'u', u'x'],
+             u'COMMENT': '\xe3\x81\xbb\xe3\x81\x92'.decode('utf-8')}}
     expects = [
         ['metaflac', '--remove-all-tags', path],
         ['metaflac', '--no-utf8-convert', '--set-tag=ALBUM=foo', path],
@@ -65,6 +68,8 @@ def test_write(monkeypatch):
         ['metaflac', '--no-utf8-convert', '--set-tag=ARTISTS=q', path],
         ['metaflac', '--no-utf8-convert', '--set-tag=ARTISTS=u', path],
         ['metaflac', '--no-utf8-convert', '--set-tag=ARTISTS=x', path],
+        ['metaflac', '--no-utf8-convert',
+         '--set-tag=COMMENT=\xe3\x81\xbb\xe3\x81\x92', path],
         ]
 
     def mock_check_call(args):
