@@ -19,14 +19,25 @@ def read(path):
            '--export-tags-to=-', path]
     output = subprocess.check_output(cmd).decode('utf-8')
     plaintag = tag.setdefault(tagtype.PLAIN, {})
+    lastkey = ''
     for line in output.splitlines():
-        key, value = line.split('=', 1)
-        if key not in plaintag:
-            plaintag[key] = value
-        elif type(plaintag[key]) == list:
-            plaintag[key].append(value)
+        if '=' in line:
+            key, value = line.split('=', 1)
+            lastkey = key
+            if key not in plaintag:
+                plaintag[key] = value
+            elif type(plaintag[key]) == list:
+                plaintag[key].append(value)
+            else:
+                plaintag[key] = [plaintag[key], value]
         else:
-            plaintag[key] = [plaintag[key], value]
+            value = plaintag[lastkey]
+            if type(value) == list:
+                value[-1] = '\n'.join([value[-1], line])
+                plaintag[lastkey] = value
+            else:
+                value = '\n'.join([value, line])
+                plaintag[lastkey] = value
     return tag
 
 

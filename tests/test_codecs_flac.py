@@ -36,6 +36,10 @@ ARTISTS=q
 ARTISTS=u
 ARTISTS=x
 COMMENT=\xe3\x81\xbb\xe3\x81\x92
+LINEFEEDTEST=abc
+def
+LINEFEEDTEST=ghi
+jkl
 '''
     monkeypatch.setattr(subprocess, 'check_output', mock_check_output)
     expect = {
@@ -45,7 +49,10 @@ COMMENT=\xe3\x81\xbb\xe3\x81\x92
              u'TITLE': u'baz',
              u'ARTIST': u'qux',
              u'ARTISTS': [u'q', u'u', u'x'],
-             u'COMMENT': '\xe3\x81\xbb\xe3\x81\x92'.decode('utf-8')}}
+             u'COMMENT': '\xe3\x81\xbb\xe3\x81\x92'.decode('utf-8'),
+             u'LINEFEEDTEST': [u'abc\ndef', u'ghi\njkl']
+             }
+    }
     assert expect == flac.read('01.flac')
 
 
