@@ -46,6 +46,9 @@ def write(path, tag):
     cmd = ['metaflac',
            '--remove-all-tags', path]
     subprocess.check_call(cmd)
+
+    # use import-tags-from
+    singleline_values = []
     for k, v in tag[tagtype.PLAIN].iteritems():
         k = k.encode('utf-8')
         if type(v) == list:
@@ -53,9 +56,21 @@ def write(path, tag):
                 vpart = vpart.encode('utf-8')
                 cmd = ['metaflac', '--no-utf8-convert',
                        '--set-tag={}={}'.format(k, vpart), path]
-                subprocess.check_call(cmd)
+                if '\n' not in k and '\n' not in vpart:
+                    singleline_values.append('{}={}'.format(k, vpart))
+                else:
+                    subprocess.check_call(cmd)
         else:
             v = v.encode('utf8')
             cmd = ['metaflac', '--no-utf8-convert',
                    '--set-tag={}={}'.format(k, v), path]
-            subprocess.check_call(cmd)
+            if '\n' not in k and '\n' not in v:
+                singleline_values.append('{}={}'.format(k, v))
+            else:
+                subprocess.check_call(cmd)
+
+    proc = subprocess.Popen(['metaflac', '--no-utf8-convert',
+                             '--import-tags-from=-', path],
+                            stdin=subprocess.PIPE)
+    proc.communicate('\n'.join(singleline_values) + '\n')
+    proc.wait()
