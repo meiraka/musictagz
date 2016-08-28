@@ -25,17 +25,9 @@ def main(argv=None):
         return 0
 
 
-def dump_yaml(glob_path):
-    flatten_data = tags.read(glob_path)
-    data = tags.deflatten(flatten_data)
-    out = yaml.safe_dump(data, default_flow_style=False,
-                         allow_unicode=True, encoding='utf8')
-    sys.stdout.write(out)
-    return 0
-
-
-def load_yaml():
-    data = yaml.safe_load(sys.stdin.read())
+def read_from_yaml_file(f):
+    """Return flatten music data from musictagz yaml file."""
+    data = yaml.safe_load(f.read())
 
     def u(s):
         if type(s) == str:
@@ -47,8 +39,35 @@ def load_yaml():
         else:
             return s
 
-    data = u(data)
+    return u(data)
 
+
+def read_from_music_file(glob_path):
+    """Return flatten music data from music files."""
+    flatten_data = tags.read(glob_path)
+    return tags.deflatten(flatten_data)
+
+
+def write_to_yaml_file(f, data):
+    """Write musictagz yaml format to file from deflatten data."""
+    out = yaml.safe_dump(data, default_flow_style=False,
+                         allow_unicode=True, encoding='utf8')
+    f.write(out)
+
+
+def write_to_music_file(data):
+    """Write music deflatten data to music files."""
     flatten_data = tags.flatten(data)
     tags.write(flatten_data)
+
+
+def dump_yaml(glob_path):
+    data = read_from_music_file(glob_path)
+    write_to_yaml_file(sys.stdout, data)
+    return 0
+
+
+def load_yaml():
+    data = read_from_yaml_file(sys.stdin)
+    write_to_music_file(data)
     return 0
