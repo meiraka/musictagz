@@ -15,24 +15,24 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dump', action='store_const',
-                        const='dump',
+                        const=('music', 'yaml'),
                         dest='command')
     parser.add_argument('-l', '--load', action='store_const',
-                        const='load',
+                        const=('yaml', 'music'),
                         dest='command')
-    parser.add_argument('-r', '--rewrite', action='store_const',
-                        const='rewrite',
+    parser.add_argument('-r', '-n', '--rewrite', '--dryrun', '--filter',
+                        action='store_const',
+                        const=('yaml', 'yaml'),
                         dest='command')
     ret = parser.parse_args(argv)
-    if ret.command == 'dump':
-        dump_yaml('./*')
-        return 0
-    elif ret.command == 'rewrite':
-        rewrite()
-        return 0
-    else:
-        load_yaml()
-        return 0
+    if ret.command is None:
+        ret.command = ('yaml', 'music')
+    read, write = ret.command
+
+    data = (read_from_yaml_file(sys.stdin) if read == 'yaml'
+            else read_from_music_file('./*'))
+    return (write_to_yaml_file(sys.stdout, data) if write == 'yaml'
+            else write_to_music_file(data))
 
 
 def read_from_yaml_file(f):
@@ -63,27 +63,11 @@ def write_to_yaml_file(f, data):
     out = yaml.safe_dump(data, default_flow_style=False,
                          allow_unicode=True, encoding='utf8')
     f.write(out)
+    return 0
 
 
 def write_to_music_file(data):
     """Write music deflatten data to music files."""
     flatten_data = tags.flatten(data)
     tags.write(flatten_data)
-
-
-def dump_yaml(glob_path):
-    data = read_from_music_file(glob_path)
-    write_to_yaml_file(sys.stdout, data)
-    return 0
-
-
-def load_yaml():
-    data = read_from_yaml_file(sys.stdin)
-    write_to_music_file(data)
-    return 0
-
-
-def rewrite():
-    data = read_from_yaml_file(sys.stdin)
-    write_to_yaml_file(sys.stdout, data)
     return 0
