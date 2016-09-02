@@ -20,7 +20,7 @@ def main(argv=None):
     parser.add_argument('-l', '--load', action='store_const',
                         const=('yaml', 'music'),
                         dest='command')
-    parser.add_argument('-r', '-n', '--rewrite', '--dryrun', '--filter',
+    parser.add_argument('-f', '-n', '--dryrun', '--filter',
                         action='store_const',
                         const=('yaml', 'yaml'),
                         dest='command')

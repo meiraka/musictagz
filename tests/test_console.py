@@ -42,7 +42,7 @@ def test_main_load(monkeypatch):
     assert 0 == console.main([])
 
 
-def test_main_rewrite(monkeypatch):
+def test_main_dryrun(monkeypatch):
     def mock_read_from_yaml_file(f):
         assert sys.stdin == f
         return {'01.flac': {'plain': {'TEST': 'TEST'}}}
@@ -57,8 +57,7 @@ def test_main_rewrite(monkeypatch):
     monkeypatch.setattr(console, 'write_to_yaml_file',
                         mock_write_to_yaml_file)
 
-    assert 0 == console.main(['--rewrite'])
-    assert 0 == console.main(['-r'])
+    assert 0 == console.main(['-f'])
     assert 0 == console.main(['--dryrun'])
     assert 0 == console.main(['-n'])
     assert 0 == console.main(['--filter'])
