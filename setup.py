@@ -12,26 +12,27 @@ with open(path.join(pwd, 'README.rst')) as f:
     long_description = f.read()
 
 
-setup(
-    name='musictagz',
-    version=musictagz.__version__,
-    description=long_description.splitlines()[4],
-    author='mei raka',
-    license='GPLv3',
-    classifiers=[
-        'Development Status :: 3 - Alpha',
-        'Environment :: Console',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Programming Language :: Python :: 2.7',
-    ],
-    packages=find_packages(exclude=['tests']),
-    # install_requires=['python-yaml'],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
-    install_requires=['PyYAML'],
-    entry_points={
-        'console_scripts': [
-            'musictagz = musictagz.console:main'
-        ]
-    },
-)
+if __name__ == '__main__':
+    setup(
+        name='musictagz',
+        version=musictagz.__version__,
+        description=long_description.splitlines()[4],
+        author='mei raka',
+        license='GPLv3',
+        classifiers=[
+            'Development Status :: 3 - Alpha',
+            'Environment :: Console',
+            'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+            'Programming Language :: Python :: 2.7',
+        ],
+        packages=find_packages(exclude=['tests']),
+        # install_requires=['python-yaml'],
+        setup_requires=['pytest-runner'],
+        tests_require=['pytest'],
+        install_requires=['PyYAML'],
+        entry_points={
+            'console_scripts': [
+                'musictagz = musictagz.console:main'
+            ]
+        },
+    )
