@@ -14,11 +14,21 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dump', action='store_true', dest='dump')
-    parser.add_argument('-l', '--load', action='store_false', dest='dump')
+    parser.add_argument('-d', '--dump', action='store_const',
+                        const='dump',
+                        dest='command')
+    parser.add_argument('-l', '--load', action='store_const',
+                        const='load',
+                        dest='command')
+    parser.add_argument('-r', '--rewrite', action='store_const',
+                        const='rewrite',
+                        dest='command')
     ret = parser.parse_args(argv)
-    if ret.dump:
+    if ret.command == 'dump':
         dump_yaml('./*')
+        return 0
+    elif ret.command == 'rewrite':
+        rewrite()
         return 0
     else:
         load_yaml()
@@ -70,4 +80,10 @@ def dump_yaml(glob_path):
 def load_yaml():
     data = read_from_yaml_file(sys.stdin)
     write_to_music_file(data)
+    return 0
+
+
+def rewrite():
+    data = read_from_yaml_file(sys.stdin)
+    write_to_yaml_file(sys.stdout, data)
     return 0

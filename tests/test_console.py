@@ -25,6 +25,16 @@ def test_main_load(monkeypatch):
     assert 0 == console.main([])
 
 
+def test_main_rewrite(monkeypatch):
+    def mock_rewrite():
+        pass
+
+    monkeypatch.setattr(console, 'rewrite', mock_rewrite)
+
+    assert 0 == console.main(['--rewrite'])
+    assert 0 == console.main(['-r'])
+
+
 def test_dump_yaml(monkeypatch):
     def mock_tags_read(glob_path):
         assert './*' == glob_path
