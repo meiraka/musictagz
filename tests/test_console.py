@@ -1,5 +1,7 @@
 import sys
 
+import pytest
+
 from musictagz import console
 from musictagz import tags
 
@@ -61,6 +63,17 @@ def test_main_dryrun(monkeypatch):
     assert 0 == console.main(['--dryrun'])
     assert 0 == console.main(['-n'])
     assert 0 == console.main(['--filter'])
+
+
+def test_main_group(monkeypatch):
+    with pytest.raises(SystemExit):
+        console.main(['--dump', '--load'])
+
+    with pytest.raises(SystemExit):
+        console.main(['--load', '--filter'])
+
+    with pytest.raises(SystemExit):
+        console.main(['--filter', '--dump'])
 
 
 def test_read_from_yaml_file():

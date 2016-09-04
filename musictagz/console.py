@@ -14,16 +14,20 @@ def main(argv=None):
         argv = sys.argv[1:]
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dump', action='store_const',
-                        const=('music', 'yaml'),
-                        dest='command')
-    parser.add_argument('-l', '--load', action='store_const',
-                        const=('yaml', 'music'),
-                        dest='command')
-    parser.add_argument('-f', '-n', '--dryrun', '--filter',
-                        action='store_const',
-                        const=('yaml', 'yaml'),
-                        dest='command')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-d', '--dump', action='store_const',
+                       const=('music', 'yaml'),
+                       dest='command',
+                       help='read audio meta data and write yaml to stdout')
+    group.add_argument('-l', '--load', action='store_const',
+                       const=('yaml', 'music'),
+                       dest='command',
+                       help='read yaml from stdin and write audio meta data')
+    group.add_argument('-f', '-n', '--dryrun', '--filter',
+                       action='store_const',
+                       const=('yaml', 'yaml'),
+                       dest='command',
+                       help='read yaml from stdin and write yaml to stdout')
     ret = parser.parse_args(argv)
     if ret.command is None:
         ret.command = ('yaml', 'music')
