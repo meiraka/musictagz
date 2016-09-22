@@ -7,6 +7,7 @@ import sys
 import yaml
 
 from musictagz import tags
+from musictagz.filter import keys
 
 
 def main(argv=None):
@@ -28,6 +29,19 @@ def main(argv=None):
                        const=('yaml', 'yaml'),
                        dest='command',
                        help='read yaml from stdin and write yaml to stdout')
+
+    keys_filter = parser.add_mutually_exclusive_group()
+    keys_filter.add_argument('-K', '--keys_upper',
+                             action='store_const',
+                             const='upper',
+                             dest='keys',
+                             help='output upppercased key meta data')
+    keys_filter.add_argument('-k', '--keys_lower',
+                             action='store_const',
+                             const='lower',
+                             dest='keys',
+                             help='output lowercaed key meta data')
+
     ret = parser.parse_args(argv)
     if ret.command is None:
         ret.command = ('yaml', 'music')
@@ -35,6 +49,10 @@ def main(argv=None):
 
     data = (read_from_yaml_file(sys.stdin) if read == 'yaml'
             else read_from_music_file('./*'))
+    if ret.keys == 'upper':
+        data = keys.upper(data)
+    elif ret.keys == 'lower':
+        data = keys.lower(data)
     return (write_to_yaml_file(sys.stdout, data) if write == 'yaml'
             else write_to_music_file(data))
 
