@@ -131,4 +131,14 @@ def test_globbing_path():
             {'plain':
                 {'TITLE': 'foobar'}}
     }
-    assert 'disc01-0*' == tags.globbing_path(flatten_data)
+    assert 'disc01-0*.flac' == tags.globbing_path(flatten_data)
+
+    flatten_data = {
+        'disc01-01 foo-baz.flac':
+            {'plain':
+                {'TITLE': 'baz'}},
+        'disc01-02 foo-foobar.flac':
+            {'plain':
+                {'TITLE': 'foobar'}}
+    }
+    assert 'disc01-0*foo*.flac' == tags.globbing_path(flatten_data)

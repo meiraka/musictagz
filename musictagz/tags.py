@@ -5,6 +5,9 @@ import os
 from musictagz.codecs import auto, error
 
 
+GLOBBING_MIN_LEN = 2
+
+
 def flatten(data):
     """Generate music data per songs."""
     ret = {}
@@ -75,26 +78,49 @@ def search_same_key_value(data):
 
 
 def globbing_path(data):
+    lname = globbing_lname(data)
+    rname = globbing_rname(data, lname)
+    cname = globbing_cname(data, lname, rname)
+    if cname:
+        return '*'.join([lname, cname, rname])
+    else:
+        return '*'.join([lname, rname])
+
+
+def globbing_lname(data):
     pathlist = data.keys()
     base = pathlist[0]
+    for n in xrange(99, GLOBBING_MIN_LEN - 1, -1):
+        searchword = base[:n].strip()
+        if all(searchword in path for path in pathlist):
+            return searchword
+    return ''
+
+
+def globbing_rname(data, lname):
+    lsize = len(lname)
+    pathlist = [i[lsize:] for i in data.keys()]
+    base = pathlist[0]
+    for n in xrange(99, GLOBBING_MIN_LEN - 1, -1):
+        searchword = base[-n:].strip()
+        if all(searchword in path for path in pathlist):
+            return searchword
+    return ''
+
+
+def globbing_cname(data, lname, rname):
+    lsize = len(lname)
+    rsize = len(rname)
+    pathlist = [i[lsize:][:rsize] for i in data.keys()]
+    base = pathlist[0]
     base_len = len(base)
-    globstr = None
-    for n in xrange(1, 100):
+    for n in xrange(99, GLOBBING_MIN_LEN - 1, -1):
         pad = 0
         found = False
         while pad + n <= base_len:
-            searchword = base[pad:pad+n]
+            searchword = base[pad:pad+n].strip()
             found = all(searchword in path for path in pathlist)
             if found:
-                if pad == 0:
-                    globstr = '{}*'.format(searchword)
-                    break
-                elif pad + n < base_len:
-                    globstr = '*{}*'.format(searchword)
-                else:
-                    globstr = '*{}'.format(searchword)
+                return searchword
             pad += 1
-        if not found:
-            break
-    if globstr is not None:
-        return globstr
+    return ''
