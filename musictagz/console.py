@@ -1,4 +1,5 @@
 """MusicTagz command line interface."""
+# coding: utf-8
 
 
 import argparse
@@ -7,7 +8,7 @@ import sys
 import yaml
 
 from musictagz import tags
-from musictagz.filter import keys
+from musictagz.filter import keys, template, web
 
 
 def main(argv=None):
@@ -42,6 +43,19 @@ def main(argv=None):
                              dest='keys',
                              help='output lowercaed key meta data')
 
+    parser.add_argument('--template',
+                        action='store_const',
+                        const=True,
+                        dest='template',
+                        help='add template key/value')
+
+    parser.add_argument('--touhouwiki',
+                        nargs=1,
+                        action='store',
+                        dest='touhouwiki',
+                        default='',
+                        help='use touhouwiki as meta data')
+
     ret = parser.parse_args(argv)
     if ret.command is None:
         ret.command = ('yaml', 'music')
@@ -49,6 +63,10 @@ def main(argv=None):
 
     data = (read_from_yaml_file(sys.stdin) if read == 'yaml'
             else read_from_music_file('./*'))
+    if ret.template:
+        data = tags.deflatten(template.musicbrainz(tags.flatten(data)))
+    if ret.touhouwiki:
+        data = tags.deflatten(web.touhouwiki(ret.touhouwiki[0], tags.flatten(data)))
     if ret.keys == 'upper':
         data = keys.upper(data)
     elif ret.keys == 'lower':
