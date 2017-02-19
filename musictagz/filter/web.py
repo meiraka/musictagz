@@ -77,6 +77,9 @@ def touhouwiki(title, data):
             value = line.split('groupCat ', 1)[1].split('=', 1)[1]
             _apply_all(data, 'ALBUMARTIST', value)
             _apply_all(data, 'LABEL', value)
+        if tag and 'composition: ' in line:
+            value = line.split('composition: ', 1)[1]
+            tag[tagtype.PLAIN]['COMPOSER'] = _delang(value)
         if tag and 'arrangement: ' in line:
             value = line.split('arrangement: ', 1)[1]
             tag[tagtype.PLAIN]['ARRANGER'] = _delang(value)
