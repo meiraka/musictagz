@@ -27,9 +27,24 @@ def musicbrainz(data):
         _write_if(tag, 'RELEASESTATUS', 'official')
         _write_if(tag, 'RELEASETYPE', 'album / single / compilation')
         _copy_if(tag, 'TITLESORT', 'TITLE')
-        _write_if(tag, 'TRACKNUMBER', 1)
+        _write_if(tag, 'TRACKNUMBER', '1')
         _copy_if(tag, 'TRACKTOTAL', 'TOTALTRACKS')
         _copy_if(tag, 'TOTALTRACKS', 'TRACKTOTAL')
+        if 'ARTIST' not in tag[tagtype.PLAIN]:
+            if 'PERFORMER' in tag[tagtype.PLAIN]:
+                artist = None
+                if isinstance(tag[tagtype.PLAIN]['PERFORMER'], str):
+                    artist = tag[tagtype.PLAIN]['PERFORMER']
+                else:
+                    for line in tag[tagtype.PLAIN]['PERFORMER']:
+                        if ' (vocals)' in line:
+                            artist = line
+                if artist and ' (vocals)' in artist:
+                    tag[tagtype.PLAIN]['ARTIST'] = artist.replace(
+                        ' (vocals)', '')
+        _copy_if(tag, 'ARRANGER', 'ARTIST')
+        _copy_if(tag, 'COMPOSER', 'ARTIST')
+
         _write_if(tag, 'WEBSITE')
     return data
 
