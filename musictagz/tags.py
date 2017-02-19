@@ -12,7 +12,7 @@ def flatten(data):
     """Generate music data per songs."""
     ret = {}
     for globpath, type_kv in data.iteritems():
-        files = glob.glob(globpath)
+        files = [globpath] if os.path.exists(globpath) else glob.glob(globpath)
         for type_, kv in type_kv.iteritems():
             for key, value in kv.iteritems():
                 for filepath in files:
@@ -82,9 +82,9 @@ def globbing_path(data):
     rname = globbing_rname(data, lname)
     cname = globbing_cname(data, lname, rname)
     if cname:
-        return '*'.join([lname, cname, rname])
+        return u'*'.join([lname, cname, rname])
     else:
-        return '*'.join([lname, rname])
+        return u'*'.join([lname, rname])
 
 
 def globbing_lname(data):
@@ -94,7 +94,7 @@ def globbing_lname(data):
         searchword = base[:n].strip()
         if all(searchword in path for path in pathlist):
             return searchword
-    return ''
+    return u''
 
 
 def globbing_rname(data, lname):
@@ -105,7 +105,7 @@ def globbing_rname(data, lname):
         searchword = base[-n:].strip()
         if all(searchword in path for path in pathlist):
             return searchword
-    return ''
+    return u''
 
 
 def globbing_cname(data, lname, rname):
@@ -123,4 +123,4 @@ def globbing_cname(data, lname, rname):
             if found:
                 return searchword
             pad += 1
-    return ''
+    return u''

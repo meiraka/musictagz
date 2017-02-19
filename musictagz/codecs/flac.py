@@ -8,7 +8,7 @@ from musictagz import tagtype
 
 def checktype(path):
     """Check path is flac file."""
-    cmd = ['file', path]
+    cmd = ['file', path.encode('utf-8')]
     return 'FLAC' in subprocess.check_output(cmd).decode('utf-8')
 
 
@@ -16,13 +16,13 @@ def read(path):
     """Read flac tag."""
     tag = {}
     cmd = ['metaflac', '--no-utf8-convert',
-           '--export-tags-to=-', path]
+           '--export-tags-to=-', path.encode('utf-8')]
     output = subprocess.check_output(cmd).decode('utf-8')
     plaintag = tag.setdefault(tagtype.PLAIN, {})
     lastkey = ''
     for line in output.splitlines():
-        if '=' in line:
-            key, value = line.split('=', 1)
+        if u'=' in line:
+            key, value = line.split(u'=', 1)
             lastkey = key
             if key not in plaintag:
                 plaintag[key] = value
@@ -33,10 +33,10 @@ def read(path):
         else:
             value = plaintag[lastkey]
             if type(value) == list:
-                value[-1] = '\n'.join([value[-1], line])
+                value[-1] = u'\n'.join([value[-1], line])
                 plaintag[lastkey] = value
             else:
-                value = '\n'.join([value, line])
+                value = u'\n'.join([value, line])
                 plaintag[lastkey] = value
     return tag
 
@@ -44,7 +44,7 @@ def read(path):
 def write(path, tag):
     """Write flac tag."""
     cmd = ['metaflac',
-           '--remove-all-tags', path]
+           '--remove-all-tags', path.encode('utf-8')]
     subprocess.check_call(cmd)
 
     # use import-tags-from

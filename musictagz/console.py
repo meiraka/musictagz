@@ -62,7 +62,7 @@ def main(argv=None):
     read, write = ret.command
 
     data = (read_from_yaml_file(sys.stdin) if read == 'yaml'
-            else read_from_music_file('./*'))
+            else read_from_music_file(u'./*'))
     if ret.template:
         data = tags.deflatten(template.musicbrainz(tags.flatten(data)))
     if ret.touhouwiki:
