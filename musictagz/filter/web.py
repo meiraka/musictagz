@@ -60,7 +60,7 @@ def touhouwiki(title, data):
     for line in markup.splitlines():
         if '{{Track|' in line:
             tag = _find_track(data, line.split('|')[1])
-            value = list(_split_nowiki(line, '|'))[2]
+            value = list(_split_nowiki(_delang(line), '|'))[2]
             tag[tagtype.PLAIN]['TITLE'] = value
         if 'website ' in line:
             value = line.split('website ', 1)[1].split('=', 1)[1]
